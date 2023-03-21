@@ -110,6 +110,7 @@ class SwipeActionsView: UIView {
         super.init(frame: .zero)
         
         clipsToBounds = true
+        layer.cornerRadius = 16
         translatesAutoresizingMaskIntoConstraints = false
         
 
