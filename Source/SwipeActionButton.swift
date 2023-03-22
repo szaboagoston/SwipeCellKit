@@ -39,7 +39,7 @@ class SwipeActionButton: UIButton {
     }
     
     convenience init(action: SwipeAction) {
-        self.init(frame: .zero)
+        self.init(type: .system)
 
         contentHorizontalAlignment = .center
         
@@ -59,17 +59,10 @@ class SwipeActionButton: UIButton {
         setTitleColor(highlightedTextColor, for: .highlighted)
         setImage(action.image, for: .normal)
         setImage(action.highlightedImage ?? action.image, for: .highlighted)
-        layer.cornerRadius = 16
+
+        layer.cornerRadius = action.cornerRadius
         clipsToBounds = true
         adjustsImageWhenHighlighted = false
-    }
-    
-    override var isHighlighted: Bool {
-        didSet {
-            guard shouldHighlight else { return }
-            
-            backgroundColor = isHighlighted ? highlightedBackgroundColor : .clear
-        }
     }
     
     func preferredWidth(maximum: CGFloat) -> CGFloat {

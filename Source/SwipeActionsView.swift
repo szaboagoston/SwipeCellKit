@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol SwipeActionsViewDelegate: class {
+protocol SwipeActionsViewDelegate: AnyObject {
     func swipeActionsView(_ swipeActionsView: SwipeActionsView, didSelect action: SwipeAction)
 }
 
@@ -31,6 +31,7 @@ class SwipeActionsView: UIView {
     let options: SwipeOptions
     
     var buttons: [SwipeActionButton] = []
+    var lastWrapperWidthConstraint: NSLayoutConstraint?
     
     var minimumButtonWidth: CGFloat = 0
     var maximumImageHeight: CGFloat {
@@ -110,29 +111,11 @@ class SwipeActionsView: UIView {
         super.init(frame: .zero)
         
         clipsToBounds = true
-        layer.cornerRadius = 16
         translatesAutoresizingMaskIntoConstraints = false
-        
+        backgroundColor = .clear
 
-    #if canImport(Combine)
-        if let backgroundColor = options.backgroundColor {
-            self.backgroundColor = backgroundColor
-        }
-        else if #available(iOS 13.0, *) {
-            backgroundColor = UIColor.systemGray5
-        } else {
-            backgroundColor = #colorLiteral(red: 0.7803494334, green: 0.7761332393, blue: 0.7967314124, alpha: 1)
-        }
-    #else
-        if let backgroundColor = options.backgroundColor {
-            self.backgroundColor = backgroundColor
-        }
-        else {
-            backgroundColor = #colorLiteral(red: 0.7803494334, green: 0.7761332393, blue: 0.7967314124, alpha: 1)
-        }
-    #endif
-        
-        buttons = addButtons(for: self.actions, withMaximum: maxSize, contentEdgeInsets: contentEdgeInsets)
+        let padding = actions.first?.padding ?? contentEdgeInsets
+        buttons = addButtons(for: self.actions, withMaximum: maxSize, contentEdgeInsets: padding)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -145,12 +128,11 @@ class SwipeActionsView: UIView {
             actionButton.addTarget(self, action: #selector(actionTapped(button:)), for: .touchUpInside)
             actionButton.autoresizingMask = [.flexibleHeight, orientation == .right ? .flexibleRightMargin : .flexibleLeftMargin]
             actionButton.spacing = options.buttonSpacing ?? 8
-            actionButton.contentEdgeInsets = buttonEdgeInsets(fromOptions: options)
             return actionButton
         })
         
         let maximum = options.maximumButtonWidth ?? (size.width - 30) / CGFloat(actions.count)
-        let minimum = options.minimumButtonWidth ?? min(maximum, 74)
+        let minimum = options.minimumButtonWidth ?? min(maximum, 74 + contentEdgeInsets.right)
         minimumButtonWidth = buttons.reduce(minimum, { initial, next in max(initial, next.preferredWidth(maximum: maximum)) })
         
         
@@ -175,10 +157,12 @@ class SwipeActionsView: UIView {
             button.maximumImageHeight = maximumImageHeight
             button.verticalAlignment = options.buttonVerticalAlignment
             button.shouldHighlight = action.hasBackgroundColor
-            
+
             wrapperView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
-            wrapperView.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
-            
+            let widthConstriant = wrapperView.widthAnchor.constraint(equalToConstant: minimumButtonWidth - action.padding.right)
+            widthConstriant.isActive = true
+            lastWrapperWidthConstraint = widthConstriant
+
             let topConstraint = wrapperView.topAnchor.constraint(equalTo: topAnchor, constant: contentEdgeInsets.top)
             topConstraint.priority = contentEdgeInsets.top == 0 ? .required : .defaultHigh
             topConstraint.isActive = true
@@ -232,6 +216,11 @@ class SwipeActionsView: UIView {
         }
         
         expansionAnimator?.addAnimations {
+            if expanded {
+                self.lastWrapperWidthConstraint?.constant = self.visibleWidth - (self.actions.last?.padding.right ?? 0)
+            } else {
+                self.lastWrapperWidthConstraint?.constant = self.minimumButtonWidth - (self.actions.last?.padding.right ?? 0)
+            }
             self.setNeedsLayout()
             self.layoutIfNeeded()
         }
@@ -292,17 +281,19 @@ class SwipeActionButtonWrapperView: UIView {
         case .left:
             contentRect = CGRect(x: frame.width - contentWidth, y: 0, width: contentWidth, height: frame.height)
         case .right:
-            contentRect = CGRect(x: 0, y: 0, width: contentWidth, height: frame.height)
+            contentRect = CGRect(x: 0, y: 0, width: contentWidth - action.padding.right, height: frame.height)
         }
         
         super.init(frame: frame)
-        
+
+        clipsToBounds = true
+        layer.cornerRadius = action.cornerRadius
         configureBackgroundColor(with: action)
     }
     
     override func draw(_ rect: CGRect) {
         super.draw(rect)
-        
+
         if let actionBackgroundColor = self.actionBackgroundColor, let context = UIGraphicsGetCurrentContext() {
             actionBackgroundColor.setFill()
             context.fill(rect);
@@ -314,7 +305,7 @@ class SwipeActionButtonWrapperView: UIView {
             isOpaque = false
             return
         }
-        
+
         if let backgroundColor = action.backgroundColor {
             actionBackgroundColor = backgroundColor
         } else {

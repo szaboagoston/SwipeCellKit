@@ -35,7 +35,8 @@ public class SwipeAction: NSObject {
     
     /// The object that is notified as transitioning occurs.
     public var transitionDelegate: SwipeActionTransitioning?
-    
+    public var cornerRadius: CGFloat = 0
+    public var padding: UIEdgeInsets = .zero
     /// The font to use for the title of the action button.
     ///
     /// - note: If you do not specify a font, a 15pt system font is used.
