@@ -217,7 +217,7 @@ class SwipeActionsView: UIView {
         
         expansionAnimator?.addAnimations {
             if expanded {
-                self.lastWrapperWidthConstraint?.constant = self.visibleWidth - (self.actions.last?.padding.right ?? 0)
+                self.lastWrapperWidthConstraint?.constant = self.visibleWidth
             } else {
                 self.lastWrapperWidthConstraint?.constant = self.minimumButtonWidth - (self.actions.last?.padding.right ?? 0)
             }
