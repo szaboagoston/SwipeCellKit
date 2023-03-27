@@ -38,7 +38,7 @@ public struct SwipeExpansionStyle {
      */
     public static func destructive(automaticallyDelete: Bool, timing: FillOptions.HandlerInvocationTiming = .with) -> SwipeExpansionStyle {
         return SwipeExpansionStyle(target: .edgeInset(30),
-                                   additionalTriggers: [.touchThreshold(0.8)],
+                                   additionalTriggers: [.touchThreshold(0.7)],
                                    completionAnimation: .fill(automaticallyDelete ? .automatic(.delete, timing: timing) : .manual(timing: timing)))
     }
 
@@ -63,7 +63,7 @@ public struct SwipeExpansionStyle {
     public var targetOverscrollElasticity: CGFloat = 0.2
     
     var minimumExpansionTranslation: CGFloat = 8.0
-    
+
     /**
      Contructs a new `SwipeExpansionStyle` instance.
      

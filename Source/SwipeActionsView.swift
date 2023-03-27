@@ -32,8 +32,6 @@ class SwipeActionsView: UIView {
     
     var buttons: [SwipeActionButton] = []
     var lastWrapperWidthConstraint: NSLayoutConstraint?
-    var lastButtonRightConstraint: NSLayoutConstraint?
-    var lastButtonLeftConstraint: NSLayoutConstraint?
     
     var minimumButtonWidth: CGFloat = 0
     var maximumImageHeight: CGFloat {
@@ -165,11 +163,9 @@ class SwipeActionsView: UIView {
             button.shouldHighlight = action.hasBackgroundColor
 
             button.centerYAnchor.constraint(equalTo: wrapperView.centerYAnchor).isActive = true
-            button.widthAnchor.constraint(equalToConstant: minimumButtonWidth - action.padding.right).isActive = true
-            lastButtonRightConstraint = button.rightAnchor.constraint(equalTo: wrapperView.rightAnchor)
-            lastButtonRightConstraint?.isActive = true
-            lastButtonLeftConstraint = button.leftAnchor.constraint(equalTo: wrapperView.leftAnchor)
-            lastButtonLeftConstraint?.isActive = false
+            button.centerXAnchor.constraint(equalTo: wrapperView.centerXAnchor).isActive = true
+            button.rightAnchor.constraint(equalTo: wrapperView.rightAnchor).isActive = true
+            button.leftAnchor.constraint(equalTo: wrapperView.leftAnchor).isActive = true
 
             wrapperView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
             let widthConstriant = wrapperView.widthAnchor.constraint(equalToConstant: minimumButtonWidth - action.padding.right)
@@ -229,10 +225,6 @@ class SwipeActionsView: UIView {
         }
         
         expansionAnimator?.addAnimations {
-            self.lastButtonRightConstraint?.isActive = false
-            self.lastButtonLeftConstraint?.isActive = false
-            self.lastButtonRightConstraint?.isActive = !expanded
-            self.lastButtonLeftConstraint?.isActive = expanded
             self.setNeedsLayout()
             self.layoutIfNeeded()
         }
