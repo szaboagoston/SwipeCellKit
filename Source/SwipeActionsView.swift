@@ -32,6 +32,8 @@ class SwipeActionsView: UIView {
     
     var buttons: [SwipeActionButton] = []
     var lastWrapperWidthConstraint: NSLayoutConstraint?
+    var lastButtonRightConstraint: NSLayoutConstraint?
+    var lastButtonLeftConstraint: NSLayoutConstraint?
     
     var minimumButtonWidth: CGFloat = 0
     var maximumImageHeight: CGFloat {
@@ -60,6 +62,10 @@ class SwipeActionsView: UIView {
             
             notifyVisibleWidthChanged(oldWidths: preLayoutVisibleWidths,
                                       newWidths: transitionLayout.visibleWidthsForViews(with: layoutContext))
+
+            self.lastWrapperWidthConstraint?.constant = max((self.visibleWidth - (self.actions.last?.padding.right ?? 0)), self.minimumButtonWidth - (self.actions.last?.padding.right ?? 0))
+            self.setNeedsLayout()
+            self.layoutIfNeeded()
         }
     }
 
@@ -158,6 +164,13 @@ class SwipeActionsView: UIView {
             button.verticalAlignment = options.buttonVerticalAlignment
             button.shouldHighlight = action.hasBackgroundColor
 
+            button.centerYAnchor.constraint(equalTo: wrapperView.centerYAnchor).isActive = true
+            button.widthAnchor.constraint(equalToConstant: minimumButtonWidth - action.padding.right).isActive = true
+            lastButtonRightConstraint = button.rightAnchor.constraint(equalTo: wrapperView.rightAnchor)
+            lastButtonRightConstraint?.isActive = true
+            lastButtonLeftConstraint = button.leftAnchor.constraint(equalTo: wrapperView.leftAnchor)
+            lastButtonLeftConstraint?.isActive = false
+
             wrapperView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
             let widthConstriant = wrapperView.widthAnchor.constraint(equalToConstant: minimumButtonWidth - action.padding.right)
             widthConstriant.isActive = true
@@ -216,11 +229,10 @@ class SwipeActionsView: UIView {
         }
         
         expansionAnimator?.addAnimations {
-            if expanded {
-                self.lastWrapperWidthConstraint?.constant = self.visibleWidth
-            } else {
-                self.lastWrapperWidthConstraint?.constant = self.minimumButtonWidth - (self.actions.last?.padding.right ?? 0)
-            }
+            self.lastButtonRightConstraint?.isActive = false
+            self.lastButtonLeftConstraint?.isActive = false
+            self.lastButtonRightConstraint?.isActive = !expanded
+            self.lastButtonLeftConstraint?.isActive = expanded
             self.setNeedsLayout()
             self.layoutIfNeeded()
         }

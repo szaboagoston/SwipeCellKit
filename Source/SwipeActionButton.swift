@@ -63,6 +63,7 @@ class SwipeActionButton: UIButton {
         layer.cornerRadius = action.cornerRadius
         clipsToBounds = true
         adjustsImageWhenHighlighted = false
+        translatesAutoresizingMaskIntoConstraints = false
     }
     
     func preferredWidth(maximum: CGFloat) -> CGFloat {
