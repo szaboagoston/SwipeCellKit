@@ -162,6 +162,8 @@ class SwipeActionsView: UIView {
             button.verticalAlignment = options.buttonVerticalAlignment
             button.shouldHighlight = action.hasBackgroundColor
 
+            button.topAnchor.constraint(equalTo: wrapperView.topAnchor).isActive = true
+            button.bottomAnchor.constraint(equalTo: wrapperView.bottomAnchor).isActive = true
             button.centerYAnchor.constraint(equalTo: wrapperView.centerYAnchor).isActive = true
             button.centerXAnchor.constraint(equalTo: wrapperView.centerXAnchor).isActive = true
             button.rightAnchor.constraint(equalTo: wrapperView.rightAnchor).isActive = true
