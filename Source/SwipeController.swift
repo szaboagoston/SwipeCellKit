@@ -118,6 +118,11 @@ class SwipeController: NSObject {
                 let expanded = expansionStyle.shouldExpand(view: swipeable, gesture: gesture, in: scrollView, within: referenceFrame)
                 let targetOffset = expansionStyle.targetOffset(for: swipeable)
                 let currentOffset = abs(translation + originalCenter - swipeable.bounds.midX)
+
+//                print("\n\(gesture.translation(in: swipeable).x)")
+//                print("currentOffset: \(currentOffset)")
+//                print(originalCenter)
+//                print(expanded)
                 
                 if expanded && !actionsView.expanded && targetOffset > currentOffset {
                     let centerForTranslationToEdge = swipeable.bounds.midX - targetOffset * actionsView.orientation.scale
@@ -125,12 +130,12 @@ class SwipeController: NSObject {
                     
                     animate(toOffset: centerForTranslationToEdge)
                     gesture.setTranslation(CGPoint(x: delta, y: 0), in: swipeable.superview!)
-                } else if !expanded && actionsView.expanded {
-                    let centerForTranslationToEdge: CGFloat = originalCenter - targetOffset * 0.7
-                    let delta = -targetOffset * 0.7
-
-                    animate(toOffset: centerForTranslationToEdge)
-                    gesture.setTranslation(CGPoint(x: delta, y: 0), in: swipeable.superview!)
+//                } else if !expanded && actionsView.expanded {
+//                    let centerForTranslationToEdge: CGFloat = (swipeable.bounds.midX - targetOffset * actionsView.orientation.scale) * 0.7
+//                    let delta = (swipeable.bounds.midX - targetOffset * actionsView.orientation.scale - originalCenter) * 0.7
+//
+//                    animate(toOffset: centerForTranslationToEdge)
+//                    gesture.setTranslation(CGPoint(x: delta, y: 0), in: swipeable.superview!)
                 } else {
                     target.center.x = gesture.elasticTranslation(in: target,
                                                                  withLimit: CGSize(width: targetOffset, height: 0),
