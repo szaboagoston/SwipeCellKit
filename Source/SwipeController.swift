@@ -41,6 +41,8 @@ class SwipeController: NSObject {
     var originalCenter: CGFloat = 0
     var scrollRatio: CGFloat = 1.0
     var originalLayoutMargins: UIEdgeInsets = .zero
+    var gestureXOffsetWhenExpanded: CGFloat = 0
+    var currentXOffsetWhenExpanded: CGFloat = 0
     
     lazy var panGestureRecognizer: UIPanGestureRecognizer = {
         let gesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan(gesture:)))
@@ -127,15 +129,18 @@ class SwipeController: NSObject {
                 if expanded && !actionsView.expanded && targetOffset > currentOffset {
                     let centerForTranslationToEdge = swipeable.bounds.midX - targetOffset * actionsView.orientation.scale
                     let delta = centerForTranslationToEdge - originalCenter
-                    
+
+                    gestureXOffsetWhenExpanded = gesture.translation(in: swipeable).x
                     animate(toOffset: centerForTranslationToEdge)
                     gesture.setTranslation(CGPoint(x: delta, y: 0), in: swipeable.superview!)
-//                } else if !expanded && actionsView.expanded {
-//                    let centerForTranslationToEdge: CGFloat = (swipeable.bounds.midX - targetOffset * actionsView.orientation.scale) * 0.7
-//                    let delta = (swipeable.bounds.midX - targetOffset * actionsView.orientation.scale - originalCenter) * 0.7
-//
-//                    animate(toOffset: centerForTranslationToEdge)
-//                    gesture.setTranslation(CGPoint(x: delta, y: 0), in: swipeable.superview!)
+
+                    currentXOffsetWhenExpanded = currentOffset
+                } else if !expanded && actionsView.expanded {
+                    let centerForTranslationToEdge: CGFloat = swipeable.bounds.midX - currentXOffsetWhenExpanded
+                    let delta = gestureXOffsetWhenExpanded
+
+                    animate(toOffset: centerForTranslationToEdge)
+                    gesture.setTranslation(CGPoint(x: delta, y: 0), in: swipeable.superview!)
                 } else {
                     target.center.x = gesture.elasticTranslation(in: target,
                                                                  withLimit: CGSize(width: targetOffset, height: 0),
