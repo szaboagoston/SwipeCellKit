@@ -126,7 +126,7 @@ class SwipeController: NSObject {
                     animate(toOffset: centerForTranslationToEdge)
                     gesture.setTranslation(CGPoint(x: delta, y: 0), in: swipeable.superview!)
                 } else if !expanded && actionsView.expanded {
-                    let centerForTranslationToEdge: CGFloat = swipeable.bounds.midX - targetOffset * 0.7
+                    let centerForTranslationToEdge: CGFloat = originalCenter - targetOffset * 0.7
                     let delta = -targetOffset * 0.7
 
                     animate(toOffset: centerForTranslationToEdge)
