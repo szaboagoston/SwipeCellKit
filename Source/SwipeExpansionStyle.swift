@@ -149,9 +149,15 @@ extension SwipeExpansionStyle {
             
             switch self {
             case .touchThreshold(let value):
-                let location = gesture.location(in: superview).x - referenceFrame.origin.x
-                let locationRatio = (actionsView.orientation == .left ? location : referenceFrame.width - location) / referenceFrame.width
-                return locationRatio > value
+                var triggerOffset: CGFloat {
+                    switch actionsView.options.expansionStyle?.target {
+                    case .edgeInset(let offset):
+                        return offset
+                    default:
+                        return 0
+                    }
+                }
+                return gesture.velocity(in: superview).x < 0 && abs(view.frame.minX) > (abs(view.frame.width) - triggerOffset) * value
             case .overscroll(let value):
                 return abs(view.frame.minX) > actionsView.preferredWidth + value
             }
