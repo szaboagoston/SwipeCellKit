@@ -44,6 +44,8 @@ public struct SwipeOptions {
     
     /// The amount of space, in points, between the button image and the button title.
     public var buttonSpacing: CGFloat?
+
+    public var fillAnimationDuration: Double?
     
     /// Constructs a new `SwipeOptions` instance with default options.
     public init() {}
